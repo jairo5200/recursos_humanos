@@ -3,7 +3,9 @@ package pt.rh.controlador;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pt.rh.excepcion.RecursoNoEncontradoExcepcion;
 import pt.rh.modelo.Empleado;
 import pt.rh.servicio.EmpleadoServicio;
 
@@ -19,25 +21,28 @@ public class EmpleadoControlador {
     @Autowired
     private EmpleadoServicio empleadoServicio;
 
-    @GetMapping("/empleado/")
+    @GetMapping("/empleados/")
     public List<Empleado> listarEmpleados(){
         List<Empleado> empleados = empleadoServicio.listarEmpleados();
         return empleados;
     }
 
-    @GetMapping("/empleado/{idEmpleado}")
-    public Empleado buscarEmpleadoPorId(@PathVariable Integer idEmpleado){
+    @GetMapping("/empleados/{idEmpleado}")
+    public ResponseEntity<Empleado> buscarEmpleadoPorId(@PathVariable Integer idEmpleado){
         Empleado empleado = empleadoServicio.buscarEmpleadoPorId(idEmpleado);
-        return empleado;
+        if (empleado == null) {
+            throw new RecursoNoEncontradoExcepcion("no se encontro el id: "+ idEmpleado);
+        }
+        return ResponseEntity.ok(empleado);
     }
 
-    @PostMapping("/empleado")
+    @PostMapping("/empleados/")
     public Empleado guardarEmpleado(@RequestBody Empleado empleado){
         Empleado elEmpleado = empleadoServicio.guardarEmpleado(empleado);
         return elEmpleado;
     }
 
-    @PutMapping("/empleado/{idEmpleado}")
+    @PutMapping("/empleados/{idEmpleado}")
     public Empleado actualizarEmpleado(@PathVariable Integer idEmpleado, @RequestBody Empleado empleado){
         Empleado elEmpleado = empleadoServicio.buscarEmpleadoPorId(idEmpleado);
         elEmpleado.setNombre(empleado.getNombre());
@@ -47,9 +52,9 @@ public class EmpleadoControlador {
         return elEmpleado;
     }
 
-    @DeleteMapping("empleado/{id}")
+    @DeleteMapping("empleados/{id}")
     public void eliminarEmpleado(@PathVariable Integer idEmpleado){
-        Empleado elEmpleado = empleadoServicio.buscarEmpleadoPorId(idEmpleado),
+        Empleado elEmpleado = empleadoServicio.buscarEmpleadoPorId(idEmpleado);
         empleadoServicio.eliminarEmpleado(elEmpleado);
     }
 }
