@@ -43,13 +43,16 @@ public class EmpleadoControlador {
     }
 
     @PutMapping("/empleados/{idEmpleado}")
-    public Empleado actualizarEmpleado(@PathVariable Integer idEmpleado, @RequestBody Empleado empleado){
+    public ResponseEntity<Empleado> actualizarEmpleado(@PathVariable Integer idEmpleado, @RequestBody Empleado empleado){
         Empleado elEmpleado = empleadoServicio.buscarEmpleadoPorId(idEmpleado);
+        if (elEmpleado == null){
+            throw  new RecursoNoEncontradoExcepcion("el id recibido no existe: "+idEmpleado);
+        }
         elEmpleado.setNombre(empleado.getNombre());
         elEmpleado.setDepartamento(empleado.getDepartamento());
         elEmpleado.setSueldo(empleado.getSueldo());
         empleadoServicio.guardarEmpleado(elEmpleado);
-        return elEmpleado;
+        return ResponseEntity.ok(elEmpleado);
     }
 
     @DeleteMapping("empleados/{id}")
