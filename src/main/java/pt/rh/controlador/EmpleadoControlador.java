@@ -9,7 +9,9 @@ import pt.rh.excepcion.RecursoNoEncontradoExcepcion;
 import pt.rh.modelo.Empleado;
 import pt.rh.servicio.EmpleadoServicio;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 //http://localhost:8080/rh-app/
@@ -55,9 +57,15 @@ public class EmpleadoControlador {
         return ResponseEntity.ok(elEmpleado);
     }
 
-    @DeleteMapping("empleados/{id}")
-    public void eliminarEmpleado(@PathVariable Integer idEmpleado){
+    @DeleteMapping("empleados/{idEmpleado}")
+    public ResponseEntity<Map<String,Boolean>> eliminarEmpleado(@PathVariable Integer idEmpleado){
         Empleado elEmpleado = empleadoServicio.buscarEmpleadoPorId(idEmpleado);
+        if (elEmpleado == null){
+            throw new RecursoNoEncontradoExcepcion("no existe el empleado con id: "+ idEmpleado);
+        }
         empleadoServicio.eliminarEmpleado(elEmpleado);
+        Map<String,Boolean> respuesta = new HashMap<>();
+        respuesta.put("eliminado",Boolean.TRUE);
+        return ResponseEntity.ok(respuesta);
     }
 }
